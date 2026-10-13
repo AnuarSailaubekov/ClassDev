@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Практикум: Коллекции в C#</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Прогресс-бар сверху -->
+  <div class="progress-bar-container">
+    <div class="progress-content">
+      <div class="progress-info">
+        <span>Прогресс практикума</span>
+        <span id="progressText">0 из 5 решено</span>
+      </div>
+      <div class="progress-track">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="brand-bar">
+        <!-- SVG Логотип -->
+        <div class="brand-logo">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Фоновый контейнер -->
+            <rect width="48" height="48" rx="12" fill="#DEF2F1"/>
+            <!-- Графика: Коллекция & C# Core -->
+            <path d="M14 17C14 14 16 13 18 13" stroke="#17252A" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M14 31C14 34 16 35 18 35" stroke="#17252A" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M12 24H16" stroke="#17252A" stroke-width="2.8" stroke-linecap="round"/>
+            <!-- Элементы стека / коллекции -->
+            <rect x="20" y="16" width="16" height="3.5" rx="1.75" fill="#2B7A78"/>
+            <rect x="20" y="22" width="16" height="3.5" rx="1.75" fill="#3AAFA9"/>
+            <rect x="20" y="28" width="16" height="3.5" rx="1.75" fill="#17252A"/>
+          </svg>
+        </div>
+        <div class="header-tag">C# Generic Collections</div>
+      </div>
+      <h1>Коллекции в C#</h1>
+      <p class="subtitle">Интерактивный практикум для проверки знаний структур данных</p>
+    </header>
+
+    <!-- Имя студента -->
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">Участник</span>
+        <div class="card-title">Имя и фамилия</div>
+      </div>
+      <input type="text" id="studentName" placeholder="Введи фамилию и имя">
+    </div>
+
+    <!-- Задание 1 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">Задание 1</span>
+        <div class="card-title">Очередь FIFO</div>
+      </div>
+      <p class="card-desc">Расставь строчки стрелками ↑ ↓ так, чтобы код скомпилировался и вывел "A".</p>
+      
+      <div id="sortableList">
+        <div class="sortable-item" data-id="addB">
+          <span>q.Enqueue("B");</span>
+          <div class="sort-btns">
+            <button onclick="moveItem(this, -1)">↑</button>
+            <button onclick="moveItem(this, 1)">↓</button>
+          </div>
+        </div>
+        <div class="sortable-item" data-id="init">
+          <span>var q = new Queue&lt;string&gt;();</span>
+          <div class="sort-btns">
+            <button onclick="moveItem(this, -1)">↑</button>
+            <button onclick="moveItem(this, 1)">↓</button>
+          </div>
+        </div>
+        <div class="sortable-item" data-id="read">
+          <span>Console.WriteLine(first);</span>
+          <div class="sort-btns">
+            <button onclick="moveItem(this, -1)">↑</button>
+            <button onclick="moveItem(this, 1)">↓</button>
+          </div>
+        </div>
+        <div class="sortable-item" data-id="addA">
+          <span>q.Enqueue("A");</span>
+          <div class="sort-btns">
+            <button onclick="moveItem(this, -1)">↑</button>
+            <button onclick="moveItem(this, 1)">↓</button>
+          </div>
+        </div>
+        <div class="sortable-item" data-id="pop">
+          <span>string first = q.Dequeue();</span>
+          <div class="sort-btns">
+            <button onclick="moveItem(this, -1)">↑</button>
+            <button onclick="moveItem(this, 1)">↓</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Задание 2 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">Задание 2</span>
+        <div class="card-title">Поиск ошибки</div>
+      </div>
+      <p class="card-desc">Выбери блок, в котором методы стека вызваны правильно.</p>
+      
+      <div class="option-card" onclick="selectVariant(this, 'A')">
+<span class="option-label">Вариант А</span>var st = new Stack&lt;int&gt;();
+st.Push(5);
+int top = st.Dequeue();
+      </div>
+
+      <div class="option-card" onclick="selectVariant(this, 'B')">
+<span class="option-label">Вариант Б</span>var st = new Stack&lt;int&gt;();
+st.Push(5);
+int top = st.Pop();
+      </div>
+    </div>
+
+    <!-- Задание 3 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">Задание 3</span>
+        <div class="card-title">Дополни код</div>
+      </div>
+      <p class="card-desc">Какая коллекция должна стоять на месте <code>???</code> для структуры первого пришедшего?</p>
+      <div class="code-snippet">var buffer = new <b>???</b>&lt;string&gt;();
+buffer.Enqueue("Запрос 1");</div>
+      <input type="text" id="inputCollection" placeholder="Введи имя коллекции (например: List)" oninput="updateProgress()">
+    </div>
+
+    <!-- Задание 4 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">Задание 4</span>
+        <div class="card-title">Поведение множеств</div>
+      </div>
+      <p class="card-desc">Какое число выведет данный фрагмент?</p>
+      <div class="code-snippet">var set = new HashSet&lt;int&gt; { 1, 2, 2, 3 };
+Console.WriteLine(set.Count);</div>
+      
+      <div class="radio-group">
+        <label class="radio-box">
+          <input type="radio" name="q4" value="4" onchange="updateProgress()">
+          <span>4 (сохраняются все элементы)</span>
+        </label>
+        <label class="radio-box">
+          <input type="radio" name="q4" value="3" onchange="updateProgress()">
+          <span>3 (дубликат числа 2 отсеивается)</span>
+        </label>
+        <label class="radio-box">
+          <input type="radio" name="q4" value="error" onchange="updateProgress()">
+          <span>Ошибка компиляции</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Задание 5 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">Задание 5</span>
+        <div class="card-title">Назначение типов</div>
+      </div>
+      <p class="card-desc">Укажи основное назначение для каждого типа данных.</p>
+      
+      <div class="match-card">
+        <div class="match-header">Dictionary&lt;TKey, TValue&gt;</div>
+        <select class="match-select" id="match_dict" onchange="updateProgress()">
+          <option value="">Выбрать назначение...</option>
+          <option value="key_lookup">Быстрый поиск по ключу</option>
+          <option value="unique">Хранение только уникальных элементов</option>
+          <option value="index">Список с быстрым доступом по индексу</option>
+        </select>
+      </div>
+
+      <div class="match-card">
+        <div class="match-header">HashSet&lt;T&gt;</div>
+        <select class="match-select" id="match_set" onchange="updateProgress()">
+          <option value="">Выбрать назначение...</option>
+          <option value="key_lookup">Быстрый поиск по ключу</option>
+          <option value="unique">Хранение только уникальных элементов</option>
+          <option value="index">Список с быстрым доступом по индексу</option>
+        </select>
+      </div>
+
+      <div class="match-card">
+        <div class="match-header">List&lt;T&gt;</div>
+        <select class="match-select" id="match_list" onchange="updateProgress()">
+          <option value="">Выбрать назначение...</option>
+          <option value="key_lookup">Быстрый поиск по ключу</option>
+          <option value="unique">Хранение только уникальных элементов</option>
+          <option value="index">Список с быстрым доступом по индексу</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="submitResults()">Отправить результат</button>
+    <div id="resultBox" class="result-alert"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
