@@ -6,9 +6,43 @@ const ENTRY_DETAILS = 'entry.83596638';
 
 let hasInteractedWithQ1 = false;
 let selectedVariant = null;
+let isSubmitting = false; // Флаг текущего процесса отправки
+
+// Проверка при загрузке страницы: сдавал ли пользователь тест ранее
+window.addEventListener('DOMContentLoaded', () => {
+  const savedResult = localStorage.getItem('csharp_quiz_submitted');
+  if (savedResult) {
+    lockForm(savedResult);
+  }
+});
+
+// Блокировка интерфейса, если работа уже отправлена
+function lockForm(scoreText) {
+  const submitBtn = document.querySelector('.btn-submit');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.5';
+    submitBtn.style.cursor = 'not-allowed';
+    submitBtn.innerText = 'Тест уже сдан';
+  }
+
+  // Блокируем поля ввода и селекторы
+  document.querySelectorAll('input, select, button:not(.btn-submit)').forEach(el => {
+    el.disabled = true;
+  });
+
+  const resultBox = document.getElementById('resultBox');
+  resultBox.style.display = 'block';
+  resultBox.style.background = 'var(--white)';
+  resultBox.style.border = '2px solid #2b7a78';
+  resultBox.style.color = '#17252a';
+  resultBox.innerHTML = `Вы уже завершили этот тест.<br>Ваш зафиксированный результат: <b>${scoreText}</b>.`;
+}
 
 // Расчет заполнения шагов
 function updateProgress() {
+  if (localStorage.getItem('csharp_quiz_submitted')) return;
+
   let completedCount = 0;
 
   if (hasInteractedWithQ1) completedCount++;
@@ -28,6 +62,7 @@ function updateProgress() {
 
 // Задание 1: перемещение строк
 function moveItem(btn, direction) {
+  if (localStorage.getItem('csharp_quiz_submitted')) return;
   const item = btn.closest('.sortable-item');
   if (direction === -1 && item.previousElementSibling) {
     item.parentNode.insertBefore(item, item.previousElementSibling);
@@ -40,6 +75,7 @@ function moveItem(btn, direction) {
 
 // Задание 2: выбор блока
 function selectVariant(element, variant) {
+  if (localStorage.getItem('csharp_quiz_submitted')) return;
   document.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
   element.classList.add('selected');
   selectedVariant = variant;
@@ -48,11 +84,25 @@ function selectVariant(element, variant) {
 
 // Проверка ответов и отправка
 async function submitResults() {
+  // 1. Защита от повторного нажатия или отправки уже сданного теста
+  if (isSubmitting || localStorage.getItem('csharp_quiz_submitted')) {
+    return;
+  }
+
   const name = document.getElementById('studentName').value.trim();
   if (!name) {
     alert("Пожалуйста, введи фамилию и имя перед отправкой.");
     return;
   }
+
+  const submitBtn = document.querySelector('.btn-submit');
+  const resultBox = document.getElementById('resultBox');
+
+  // Включаем блокировку кнопки на время запроса
+  isSubmitting = true;
+  submitBtn.disabled = true;
+  submitBtn.style.opacity = '0.6';
+  submitBtn.innerText = 'Отправка...';
 
   let score = 0;
   let log = [];
@@ -104,17 +154,17 @@ async function submitResults() {
     log.push("Q5: Ошибка сопоставления");
   }
 
+  const scoreString = `${score}/5`;
   const formData = new FormData();
   formData.append(ENTRY_NAME, name);
-  formData.append(ENTRY_SCORE, `${score}/5`);
+  formData.append(ENTRY_SCORE, scoreString);
   formData.append(ENTRY_DETAILS, log.join(' | '));
 
-  const resultBox = document.getElementById('resultBox');
   resultBox.style.display = 'block';
   resultBox.style.background = 'var(--white)';
   resultBox.style.border = '2px solid var(--dark)';
   resultBox.style.color = 'var(--dark)';
-  resultBox.innerText = 'Отправка данных...';
+  resultBox.innerText = 'Сохранение результата...';
 
   try {
     await fetch(FORM_URL, {
@@ -123,11 +173,18 @@ async function submitResults() {
       body: formData
     });
 
-    resultBox.style.background = 'var(--white)';
-    resultBox.style.border = '2px solid #2b7a78';
-    resultBox.style.color = '#17252a';
-    resultBox.innerHTML = `Готово, <b>${name}</b>!<br>Результат: <b>${score} из 5</b> отправлен в журнал.`;
+    // Сохраняем факт успешной сдачи в браузер устройства
+    localStorage.setItem('csharp_quiz_submitted', scoreString);
+
+    // Блокируем форму окончательно
+    lockForm(scoreString);
   } catch (e) {
+    // В случае реального сбоя сети возвращаем кнопку в рабочее состояние
+    isSubmitting = false;
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+    submitBtn.innerText = 'Отправить результат';
+
     resultBox.style.background = '#fef2f2';
     resultBox.style.border = '2px solid #b91c1c';
     resultBox.style.color = '#b91c1c';
